@@ -1,0 +1,28 @@
+{
+  "name": "@pal-plugin/boot-animation",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Play a configurable intro when PAL opens or a pinned conversation is entered.",
+  "license": "MIT",
+  "files": ["pal-manifest.json", "dist", "media", "LICENSE", "NOTICE"],
+  "scripts": {
+    "build": "pal-plugin-build .",
+    "pack": "pal-plugin pack .",
+    "typecheck": "tsc --noEmit",
+    "test": "node --experimental-strip-types --test tests/*.test.mjs"
+  },
+  "devDependencies": {
+    "@anypal/contracts": "file:vendor/anypal-contracts-0.1.0.tgz",
+    "@anypal/plugin-build": "0.1.0",
+    "@anypal/plugin-sdk": "0.1.0",
+    "@types/node": "^24.3.0",
+    "typescript": "^5.9.2"
+  },
+  "pal": {
+    "id": "pal.boot-animation",
+    "apiVersion": 1,
+    "runtime": "node",
+    "manifest": "./pal-manifest.json"
+  },
+  "exports": "./dist/index.cjs"
+}

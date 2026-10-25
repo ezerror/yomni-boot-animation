@@ -1,0 +1,38 @@
+{
+  "title": "Boot Animation",
+  "activationScope": "global",
+  "configScope": "global",
+  "author": "PAL; adapted from Modera contributors",
+  "category": "personalization",
+  "icon": "play",
+  "permissions": ["pal.storage.read", "pal.storage.write"],
+  "extensions": ["pal.window.overlay", "pal.sidebar.footer.action"],
+  "locales": {
+    "zh-CN": {
+      "name": "片头动画",
+      "description": "启动时或进入指定会话时播放可自定义的视频片头。"
+    }
+  },
+  "requiresHost": {
+    "pal.plugin.declarations": 2,
+    "pal.extension.window.overlay": 2,
+    "pal.context.public": 1,
+    "pal.picker.files": 1
+  },
+  "declarations": {
+    "provides": {
+      "ui": [
+        {
+          "id": "pal.boot-animation.overlay",
+          "slot": "pal.window.overlay",
+          "description": "Video playback and clip library"
+        },
+        {
+          "id": "pal.boot-animation.controls",
+          "slot": "pal.sidebar.footer.action",
+          "description": "Open the clip library and pin this conversation"
+        }
+      ]
+    }
+  }
+}
