@@ -62,7 +62,7 @@ test("media byte ranges reject invalid and unsatisfiable requests", () => {
 
 test("manual intro and environment video are discoverable without importing them", async () => {
   const directory = await mkdtemp(join(import.meta.dirname, ".boot-test-"));
-  const previous = process.env.PAL_BOOT_ANIMATION;
+  const previous = (process.env.YOMNI_BOOT_ANIMATION ?? process.env.PAL_BOOT_ANIMATION);
   try {
     const intro = join(directory, "intro.mp4");
     const external = join(directory, "external.webm");
@@ -71,7 +71,7 @@ test("manual intro and environment video are discoverable without importing them
     await writeFile(join(videos, "my clip.mp4"), "folder video");
     await writeFile(intro, "manual video");
     await writeFile(external, "external video");
-    process.env.PAL_BOOT_ANIMATION = external;
+    process.env.YOMNI_BOOT_ANIMATION = external;
     const store = new ClipStore(directory);
     const listed = await store.clips();
     assert.deepEqual(listed.slice(1).map((clip) => clip.id), ["manual-intro", "environment"]);
@@ -81,8 +81,8 @@ test("manual intro and environment video are discoverable without importing them
     assert.equal((await store.file("environment")).size, 14);
     assert.equal(await store.remove("manual-intro"), false);
   } finally {
-    if (previous === undefined) delete process.env.PAL_BOOT_ANIMATION;
-    else process.env.PAL_BOOT_ANIMATION = previous;
+    if (previous === undefined) delete process.env.YOMNI_BOOT_ANIMATION;
+    else process.env.YOMNI_BOOT_ANIMATION = previous;
     await rm(directory, { recursive: true, force: true });
   }
 });

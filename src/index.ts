@@ -2,7 +2,7 @@ import { createServer } from "node:http";
 import { randomBytes } from "node:crypto";
 import { readFile, stat } from "node:fs/promises";
 import { basename, join, resolve } from "node:path";
-import { definePlugin, type PluginModule } from "@anypal/plugin-sdk";
+import { definePlugin, type PluginModule } from "@yomni/plugin-sdk";
 import { ClipStore } from "./store.js";
 import { overlaySurface, type LibrarySnapshot } from "./surface.js";
 
@@ -87,8 +87,8 @@ export const activate: PluginModule["activate"] = async (host) => {
   };
   const report = (text: string) => { message = text; refresh(); };
 
-  return definePlugin((pal) => {
-    pal.ui.register({
+  return definePlugin((yomni) => {
+    yomni.ui.register({
       id: "pal.boot-animation.controls",
       slot: "pal.sidebar.footer.action",
       requiredPermissions: ["pal.storage.read", "pal.storage.write"],
@@ -122,7 +122,7 @@ export const activate: PluginModule["activate"] = async (host) => {
         }
       },
     });
-    pal.ui.register({
+    yomni.ui.register({
       id: "pal.boot-animation.overlay",
       slot: "pal.window.overlay",
       requiredPermissions: ["pal.storage.read", "pal.storage.write"],

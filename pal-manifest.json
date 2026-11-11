@@ -1,8 +1,6 @@
 {
   "title": "Boot Animation",
-  "activationScope": "global",
-  "configScope": "global",
-  "author": "PAL; adapted from Modera contributors",
+  "author": "Yomni; adapted from Modera contributors",
   "category": "personalization",
   "icon": "play",
   "permissions": ["pal.storage.read", "pal.storage.write"],

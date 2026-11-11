@@ -97,7 +97,7 @@ export class ClipStore {
     }
     const intro = await stat(this.introFile).catch(() => null);
     if (intro?.isFile() && intro.size > 0) clips.push({ id: "manual-intro", name: "手动放入的 intro.mp4", bytes: intro.size, type: "video/mp4", writable: false });
-    const environment = process.env.PAL_BOOT_ANIMATION;
+    const environment = (process.env.YOMNI_BOOT_ANIMATION ?? process.env.PAL_BOOT_ANIMATION);
     const extension = environment && /\.(mp4|webm|m4v)$/i.exec(environment)?.[0].toLowerCase();
     if (environment && extension && VIDEO_TYPES.has(extension)) {
       const info = await stat(environment).catch(() => null);
@@ -129,7 +129,7 @@ export class ClipStore {
       return info?.isFile() && info.size > 0 ? { path, size: info.size, type: "video/mp4" } : null;
     }
     if (id === "manual-intro" || id === "environment") {
-      const path = id === "manual-intro" ? this.introFile : process.env.PAL_BOOT_ANIMATION;
+      const path = id === "manual-intro" ? this.introFile : (process.env.YOMNI_BOOT_ANIMATION ?? process.env.PAL_BOOT_ANIMATION);
       const extension = path && /\.(mp4|webm|m4v)$/i.exec(path)?.[0].toLowerCase();
       if (!path || !extension || !VIDEO_TYPES.has(extension)) return null;
       const info = await stat(path).catch(() => null);

@@ -1,21 +1,28 @@
 {
-  "name": "@pal-plugin/boot-animation",
+  "name": "@yomni/plugin-boot-animation",
   "version": "0.1.0",
   "type": "module",
-  "description": "Play a configurable intro when PAL opens or a pinned conversation is entered.",
+  "description": "Play a configurable intro when Yomni opens or a pinned conversation is entered.",
   "license": "MIT",
-  "files": ["pal-manifest.json", "dist", "media", "LICENSE", "NOTICE"],
+  "files": [
+    "pal-manifest.json",
+    "dist",
+    "media",
+    "LICENSE",
+    "NOTICE"
+  ],
   "scripts": {
-    "build": "pal-plugin-build .",
-    "pack": "pal-plugin pack .",
+    "build": "yomni-plugin-build .",
+    "pack": "yomni-plugin pack .",
     "typecheck": "tsc --noEmit",
     "test": "node --experimental-strip-types --test tests/*.test.mjs"
   },
   "devDependencies": {
-    "@anypal/contracts": "file:vendor/anypal-contracts-0.1.0.tgz",
-    "@anypal/plugin-build": "0.1.0",
-    "@anypal/plugin-sdk": "0.1.0",
     "@types/node": "^24.3.0",
+    "@yomni/contracts": "file:vendor/yomni-devkit/yomni-contracts-0.1.0.tgz",
+    "@yomni/plugin-build": "file:vendor/yomni-devkit/yomni-plugin-build-0.1.0.tgz",
+    "@yomni/plugin-sdk": "file:vendor/yomni-devkit/yomni-plugin-sdk-0.1.0.tgz",
+    "@yomni/ui": "file:vendor/yomni-devkit/yomni-ui-0.1.0.tgz",
     "typescript": "^5.9.2"
   },
   "pal": {
