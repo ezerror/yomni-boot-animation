@@ -47,7 +47,7 @@ export function overlaySurface(input: {
     @media(prefers-reduced-motion:reduce){.orbit{animation:none}}
   </style></head><body><div id="app"></div><script>
     const data=${payload};const app=document.getElementById('app');
-    const act=(action,value)=>parent.postMessage({type:'pal.plugin.action',action,...(value===undefined?{}:{value:String(value)})},'*');
+    const act=(action,value)=>parent.postMessage({type:'yomni.plugin.action',action,...(value===undefined?{}:{value:String(value)})},'*');
     const button=(label,action,value,kind='')=>{const b=document.createElement('button');b.type='button';b.className='btn '+kind;b.textContent=label;b.addEventListener('click',()=>act(action,value));return b};
     const row=()=>{const e=document.createElement('div');e.className='row';return e};
     if(data.mode==='video'){
@@ -69,6 +69,6 @@ export function overlaySurface(input: {
       const foot=document.createElement('div');foot.className='controls';foot.append(button('导入视频','upload'),button('播放当前选择','play'));body.append(foot);panel.append(body);app.append(panel);
       window.addEventListener('keydown',e=>{if(e.key==='Escape')act('close')});head.querySelector('button')?.focus();
     }
-    parent.postMessage({type:'pal.plugin.ready'},'*');
+    parent.postMessage({type:'yomni.plugin.ready'},'*');
   </script></body></html>`;
 }

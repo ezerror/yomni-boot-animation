@@ -5,7 +5,7 @@
   "description": "Play a configurable intro when Yomni opens or a pinned conversation is entered.",
   "license": "MIT",
   "files": [
-    "pal-manifest.json",
+    "yomni-manifest.json",
     "dist",
     "media",
     "LICENSE",
@@ -25,11 +25,11 @@
     "@yomni/ui": "file:vendor/yomni-devkit/yomni-ui-0.1.0.tgz",
     "typescript": "^5.9.2"
   },
-  "pal": {
-    "id": "pal.boot-animation",
+  "yomni": {
+    "id": "yomni.boot-animation",
     "apiVersion": 1,
     "runtime": "node",
-    "manifest": "./pal-manifest.json"
+    "manifest": "./yomni-manifest.json"
   },
   "exports": "./dist/index.cjs"
 }

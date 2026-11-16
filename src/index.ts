@@ -89,9 +89,9 @@ export const activate: PluginModule["activate"] = async (host) => {
 
   return definePlugin((yomni) => {
     yomni.ui.register({
-      id: "pal.boot-animation.controls",
-      slot: "pal.sidebar.footer.action",
-      requiredPermissions: ["pal.storage.read", "pal.storage.write"],
+      id: "yomni.boot-animation.controls",
+      slot: "yomni.sidebar.footer.action",
+      requiredPermissions: ["yomni.storage.read", "yomni.storage.write"],
       actions: ["library", "pin"],
       async render(request) {
         const settings = await store.settings() as Settings;
@@ -123,9 +123,9 @@ export const activate: PluginModule["activate"] = async (host) => {
       },
     });
     yomni.ui.register({
-      id: "pal.boot-animation.overlay",
-      slot: "pal.window.overlay",
-      requiredPermissions: ["pal.storage.read", "pal.storage.write"],
+      id: "yomni.boot-animation.overlay",
+      slot: "yomni.window.overlay",
+      requiredPermissions: ["yomni.storage.read", "yomni.storage.write"],
       actions: ["skip", "ended", "close", "preview", "play", "select", "override", "pin", "setting", "upload", "delete"],
       async render(request) {
         const library = await snapshot(request.sessionId);

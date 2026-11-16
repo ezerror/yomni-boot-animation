@@ -9,7 +9,7 @@ const require = createRequire(import.meta.url);
 const plugin = require("../dist/index.cjs");
 
 test("startup, library actions and ranged built-in video use declared Yomni UI", async () => {
-  const storagePath = await mkdtemp(join(tmpdir(), "pal-boot-animation-"));
+  const storagePath = await mkdtemp(join(tmpdir(), "yomni-boot-animation-"));
   const controller = new AbortController();
   let invalidations = 0;
   try {
@@ -23,8 +23,8 @@ test("startup, library actions and ranged built-in video use declared Yomni UI",
         dialog: { confirm: async () => false },
       }),
     });
-    const overlay = contributions.ui.find((item) => item.slot === "pal.window.overlay");
-    const controls = contributions.ui.find((item) => item.slot === "pal.sidebar.footer.action");
+    const overlay = contributions.ui.find((item) => item.slot === "yomni.window.overlay");
+    const controls = contributions.ui.find((item) => item.slot === "yomni.sidebar.footer.action");
     assert.ok(overlay);
     assert.ok(controls);
     const context = { signal: controller.signal };

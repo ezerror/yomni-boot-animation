@@ -62,7 +62,7 @@ test("media byte ranges reject invalid and unsatisfiable requests", () => {
 
 test("manual intro and environment video are discoverable without importing them", async () => {
   const directory = await mkdtemp(join(import.meta.dirname, ".boot-test-"));
-  const previous = (process.env.YOMNI_BOOT_ANIMATION ?? process.env.PAL_BOOT_ANIMATION);
+  const previous = (process.env.YOMNI_BOOT_ANIMATION);
   try {
     const intro = join(directory, "intro.mp4");
     const external = join(directory, "external.webm");
