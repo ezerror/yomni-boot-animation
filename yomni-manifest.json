@@ -37,6 +37,18 @@
           "description": "Open the clip library and pin this conversation"
         }
       ]
+    },
+    "consumes": {
+      "commands": [
+        {
+          "id": "yomni.picker.files",
+          "reason": "Import a user-selected intro video into the clip library"
+        },
+        {
+          "id": "yomni.dialog.confirm",
+          "reason": "Confirm deleting an imported intro video"
+        }
+      ]
     }
   }
 }

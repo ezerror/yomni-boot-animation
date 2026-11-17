@@ -1,6 +1,6 @@
 {
   "name": "@yomni/plugin-boot-animation",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "description": "Play a configurable intro when Yomni opens or a pinned conversation is entered.",
   "license": "MIT",

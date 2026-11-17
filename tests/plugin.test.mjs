@@ -4,6 +4,7 @@ import { createRequire } from "node:module";
 import { mkdtemp, rm } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
+import { ClipStore } from "../src/store.js";
 
 const require = createRequire(import.meta.url);
 const plugin = require("../dist/index.cjs");
@@ -12,6 +13,8 @@ test("startup, library actions and ranged built-in video use declared Yomni UI",
   const storagePath = await mkdtemp(join(tmpdir(), "yomni-boot-animation-"));
   const controller = new AbortController();
   let invalidations = 0;
+  let pickedFiles = null;
+  let confirmDelete = false;
   try {
     const contributions = await plugin.activate({
       storagePath,
@@ -19,8 +22,8 @@ test("startup, library actions and ranged built-in video use declared Yomni UI",
       signal: controller.signal,
       invalidateUi: () => { invalidations++; },
       public: () => ({
-        picker: { files: async () => null },
-        dialog: { confirm: async () => false },
+        picker: { files: async () => pickedFiles },
+        dialog: { confirm: async () => confirmDelete },
       }),
     });
     const overlay = contributions.ui.find((item) => item.slot === "yomni.window.overlay");
@@ -43,6 +46,20 @@ test("startup, library actions and ranged built-in video use declared Yomni UI",
     assert.equal((await overlay.render(request, context)).hidden, true);
     await controls.act({ id: "library" }, context, { ...request, id: controls.id });
     assert.match((await overlay.render(request, context)).surface.html, /片头片库/);
+    pickedFiles = [resolve("media/deepseek-brand-intro.mp4")];
+    await overlay.act({ id: "upload" }, context, request);
+    const store = new ClipStore(storagePath);
+    const imported = (await store.clips()).find(clip => clip.writable);
+    assert.ok(imported);
+    assert.equal(imported.name, "deepseek-brand-intro.mp4");
+    const importedVideo = await fetch(endpoint + "/media/" + imported.id, { headers: { Range: "bytes=0-31" } });
+    assert.equal(importedVideo.status, 206);
+    assert.equal(Buffer.from(await importedVideo.arrayBuffer()).toString("ascii", 4, 8), "ftyp");
+    await overlay.act({ id: "delete", value: imported.id }, context, request);
+    assert.ok((await store.clips()).some(clip => clip.id === imported.id));
+    confirmDelete = true;
+    await overlay.act({ id: "delete", value: imported.id }, context, request);
+    assert.equal((await store.clips()).some(clip => clip.id === imported.id), false);
     await overlay.act({ id: "select", value: "builtin-brand" }, context, request);
     const library = await overlay.render(request, context);
     assert.match(library.surface.html, /builtin-brand/);
