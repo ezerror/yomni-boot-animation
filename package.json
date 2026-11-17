@@ -9,7 +9,8 @@
     "dist",
     "media",
     "LICENSE",
-    "NOTICE"
+    "NOTICE",
+    "assets"
   ],
   "scripts": {
     "build": "yomni-plugin-build .",
