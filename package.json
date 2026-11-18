@@ -1,6 +1,6 @@
 {
   "name": "@yomni/plugin-boot-animation",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "type": "module",
   "description": "Play a configurable intro when Yomni opens or a pinned conversation is entered.",
   "license": "MIT",
@@ -20,10 +20,12 @@
   },
   "devDependencies": {
     "@types/node": "^24.3.0",
+    "@types/react": "^19.2.17",
     "@yomni/contracts": "file:vendor/yomni-devkit/yomni-contracts-0.1.0.tgz",
     "@yomni/plugin-build": "file:vendor/yomni-devkit/yomni-plugin-build-0.1.0.tgz",
     "@yomni/plugin-sdk": "file:vendor/yomni-devkit/yomni-plugin-sdk-0.1.0.tgz",
     "@yomni/ui": "file:vendor/yomni-devkit/yomni-ui-0.1.0.tgz",
+    "react": "^19.3.1",
     "typescript": "^5.9.2"
   },
   "yomni": {

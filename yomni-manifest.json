@@ -8,8 +8,7 @@
     "yomni.storage.write"
   ],
   "extensions": [
-    "yomni.window.overlay",
-    "yomni.sidebar.footer.action"
+    "yomni.window.overlay"
   ],
   "locales": {
     "zh-CN": {
@@ -21,7 +20,9 @@
     "yomni.plugin.declarations": 2,
     "yomni.extension.window.overlay": 2,
     "yomni.context.public": 1,
-    "yomni.picker.files": 1
+    "yomni.picker.files": 1,
+    "yomni.ui.workbench.hostRenderer": 2,
+    "yomni.ui.sidebar.footer": 1
   },
   "declarations": {
     "provides": {
@@ -30,11 +31,80 @@
           "id": "yomni.boot-animation.overlay",
           "slot": "yomni.window.overlay",
           "description": "Video playback and clip library"
+        }
+      ],
+      "access": [
+        {
+          "id": "yomni.boot-animation.footer.snapshot",
+          "title": "Read intro pin state",
+          "description": "Read whether the current conversation has a pinned intro",
+          "effect": "read",
+          "scope": "global",
+          "target": {
+            "kind": "service-method",
+            "contract": "yomni.boot-animation.footer",
+            "operation": "snapshot"
+          },
+          "locales": {
+            "zh": {
+              "title": "读取片头固定状态",
+              "description": "读取当前会话是否固定片头"
+            }
+          }
         },
         {
-          "id": "yomni.boot-animation.controls",
-          "slot": "yomni.sidebar.footer.action",
-          "description": "Open the clip library and pin this conversation"
+          "id": "yomni.boot-animation.footer.library",
+          "title": "Open intro library",
+          "description": "Open the intro video library",
+          "effect": "write",
+          "scope": "global",
+          "target": {
+            "kind": "service-method",
+            "contract": "yomni.boot-animation.footer",
+            "operation": "library"
+          },
+          "locales": {
+            "zh": {
+              "title": "打开片头片库",
+              "description": "打开片头视频片库"
+            }
+          }
+        },
+        {
+          "id": "yomni.boot-animation.footer.pin",
+          "title": "Pin conversation intro",
+          "description": "Toggle the current conversation intro",
+          "effect": "write",
+          "scope": "global",
+          "target": {
+            "kind": "service-method",
+            "contract": "yomni.boot-animation.footer",
+            "operation": "pin"
+          },
+          "locales": {
+            "zh": {
+              "title": "固定会话片头",
+              "description": "切换当前会话的片头固定状态"
+            }
+          }
+        },
+        {
+          "id": "yomni.boot-animation.footer.changed",
+          "title": "Watch intro pin state",
+          "description": "Receive intro settings changes",
+          "effect": "read",
+          "scope": "global",
+          "target": {
+            "kind": "service-event",
+            "contract": "yomni.boot-animation.footer",
+            "operation": "changed"
+          },
+          "locales": {
+            "zh": {
+              "title": "订阅片头固定状态",
+              "description": "接收片头设置变化"
+            }
+          }
         }
       ]
     },
@@ -48,7 +118,52 @@
           "id": "yomni.dialog.confirm",
           "reason": "Confirm deleting an imported intro video"
         }
+      ],
+      "slots": [
+        {
+          "id": "yomni.boot-animation.controls",
+          "target": {
+            "kind": "yomni.app-shell.sidebar-footer-view",
+            "version": 1
+          },
+          "content": {
+            "component": {
+              "module": "footer",
+              "export": "default"
+            },
+            "props": {},
+            "order": 40
+          },
+          "commands": []
+        }
       ]
+    }
+  },
+  "contributions": [
+    "slotContributions",
+    "services"
+  ],
+  "hostRenderers": {
+    "footer": {
+      "root": "dist/ui",
+      "entry": "footer.js"
+    }
+  },
+  "provides": {
+    "yomni.boot-animation.footer": {
+      "contract": "yomni.boot-animation.footer",
+      "apiVersion": 1,
+      "transport": "clone"
+    }
+  },
+  "consumes": {
+    "footer": {
+      "contract": "yomni.boot-animation.footer",
+      "apiVersion": 1,
+      "autoBind": true,
+      "transport": "clone",
+      "optional": true,
+      "bindingMode": "dynamic"
     }
   }
 }

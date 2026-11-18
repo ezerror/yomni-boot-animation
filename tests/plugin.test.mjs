@@ -27,7 +27,7 @@ test("startup, library actions and ranged built-in video use declared Yomni UI",
       }),
     });
     const overlay = contributions.ui.find((item) => item.slot === "yomni.window.overlay");
-    const controls = contributions.ui.find((item) => item.slot === "yomni.sidebar.footer.action");
+    const controls = contributions.slotContributions.find((item) => item.id === "yomni.boot-animation.controls");
     assert.ok(overlay);
     assert.ok(controls);
     const context = { signal: controller.signal };
@@ -44,7 +44,13 @@ test("startup, library actions and ranged built-in video use declared Yomni UI",
     assert.equal((await fetch(endpoint + "/media/builtin-unknown")).status, 404);
     await overlay.act({ id: "skip" }, context, request);
     assert.equal((await overlay.render(request, context)).hidden, true);
-    await controls.act({ id: "library" }, context, { ...request, id: controls.id });
+    assert.deepEqual(controls.target, { kind: "yomni.app-shell.sidebar-footer-view", version: 1 });
+    const footer = contributions.services["yomni.boot-animation.footer"];
+    const footerContext = { ...context, callerAuthority: {
+      signal: controller.signal, available: () => true,
+      grantedPermissions: ["yomni.storage.read", "yomni.storage.write"],
+    } };
+    await footer.methods.library.call({}, footerContext);
     assert.match((await overlay.render(request, context)).surface.html, /片头片库/);
     pickedFiles = [resolve("media/deepseek-brand-intro.mp4")];
     await overlay.act({ id: "upload" }, context, request);
@@ -68,6 +74,18 @@ test("startup, library actions and ranged built-in video use declared Yomni UI",
     await overlay.act({ id: "ended" }, context, request);
     assert.match((await overlay.render(request, context)).surface.html, /片头片库/);
     assert.ok(invalidations >= 4);
+    let changes = 0;
+    const stop = footer.events.changed.subscribe(() => changes++, footerContext);
+    const session = { ...footerContext, sessionId: "session-1" };
+    assert.equal((await footer.methods.snapshot.call({}, session)).pinned, false);
+    await footer.methods.pin.call({}, session);
+    assert.equal((await footer.methods.snapshot.call({}, session)).pinned, true);
+    assert.equal((await footer.methods.snapshot.call({}, { ...session, sessionId: "session-2" })).pinned, false);
+    await overlay.act({ id: "pin" }, context, { ...request, sessionId: "session-1" });
+    assert.equal((await footer.methods.snapshot.call({}, session)).pinned, false);
+    assert.equal(changes, 2);
+    stop();
+    await assert.rejects(footer.methods.pin.call({}, { ...session, callerAuthority: { ...session.callerAuthority, grantedPermissions: [] } }), { code: "PERMISSION" });
   } finally {
     controller.abort();
     await rm(storagePath, { recursive: true, force: true });

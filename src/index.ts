@@ -2,7 +2,7 @@ import { createServer } from "node:http";
 import { randomBytes } from "node:crypto";
 import { readFile, stat } from "node:fs/promises";
 import { basename, join, resolve } from "node:path";
-import { definePlugin, type PluginModule } from "@yomni/plugin-sdk";
+import { assertServiceCallPermissions, definePlugin, type PluginModule } from "@yomni/plugin-sdk";
 import { ClipStore } from "./store.js";
 import { overlaySurface, type LibrarySnapshot } from "./surface.js";
 
@@ -50,7 +50,12 @@ export const activate: PluginModule["activate"] = async (host) => {
   let lastRandomClip: string | null = null;
   let message = "";
   const mounted = new Set<string>();
-  const refresh = () => host.invalidateUi?.();
+  const footerListeners = new Set<(value: unknown) => void>();
+  const refresh = () => {
+    host.invalidateUi?.();
+    for (const emit of footerListeners) emit(null);
+  };
+  host.signal.addEventListener("abort", () => footerListeners.clear(), { once: true });
   const snapshot = async (sessionId: string): Promise<LibrarySnapshot> => ({
     clips: await store.clips() as Clip[],
     settings: await store.settings() as Settings,
@@ -88,39 +93,15 @@ export const activate: PluginModule["activate"] = async (host) => {
   const report = (text: string) => { message = text; refresh(); };
 
   return definePlugin((yomni) => {
-    yomni.ui.register({
+    yomni.slots.contribute({
       id: "yomni.boot-animation.controls",
-      slot: "yomni.sidebar.footer.action",
-      requiredPermissions: ["yomni.storage.read", "yomni.storage.write"],
-      actions: ["library", "pin"],
-      async render(request) {
-        const settings = await store.settings() as Settings;
-        const pinned = !!request.sessionId && settings.pinnedSessions.includes(request.sessionId);
-        return {
-          title: "片头动画",
-          children: [{
-            type: "row",
-            children: [
-              { type: "button", label: "片头片库", action: "library", quiet: true },
-              { type: "button", label: pinned ? "取消会话片头" : "固定会话片头", action: "pin", quiet: true },
-            ],
-          }],
-        };
+      target: { kind: "yomni.app-shell.sidebar-footer-view", version: 1 },
+      content: {
+        component: { module: "footer", export: "default" },
+        props: {},
+        order: 40,
       },
-      async act(action, _context, request) {
-        if (action.id === "library") {
-          overlay = { mode: "library", clipId: null, returnToLibrary: false };
-          message = "";
-          refresh();
-        } else if (action.id === "pin" && request.sessionId) {
-          const settings = await store.settings() as Settings;
-          const pinnedSessions = new Set(settings.pinnedSessions);
-          if (pinnedSessions.has(request.sessionId)) pinnedSessions.delete(request.sessionId);
-          else pinnedSessions.add(request.sessionId);
-          await store.save({ ...settings, pinnedSessions: [...pinnedSessions] });
-          refresh();
-        }
-      },
+      commands: [],
     });
     yomni.ui.register({
       id: "yomni.boot-animation.overlay",
@@ -211,5 +192,56 @@ export const activate: PluginModule["activate"] = async (host) => {
         if (request.mountId) mounted.delete(request.mountId);
       },
     });
+    return {
+      services: {
+        "yomni.boot-animation.footer": {
+          contract: "yomni.boot-animation.footer",
+          apiVersion: 1,
+          transport: "clone",
+          methods: {
+            snapshot: {
+              requiredPermissions: ["yomni.storage.read"],
+              async call(_input, context) {
+                assertServiceCallPermissions(context, ["yomni.storage.read"], { readOnly: true });
+                const settings = await store.settings() as Settings;
+                return { pinned: !!context.sessionId && settings.pinnedSessions.includes(context.sessionId) };
+              },
+            },
+            library: {
+              requiredPermissions: ["yomni.storage.read"],
+              async call(_input, context) {
+                assertServiceCallPermissions(context, ["yomni.storage.read"]);
+                overlay = { mode: "library", clipId: null, returnToLibrary: false };
+                message = "";
+                refresh();
+              },
+            },
+            pin: {
+              requiredPermissions: ["yomni.storage.read", "yomni.storage.write"],
+              async call(_input, context) {
+                assertServiceCallPermissions(context, ["yomni.storage.read", "yomni.storage.write"]);
+                if (!context.sessionId) return;
+                const settings = await store.settings() as Settings;
+                const pinnedSessions = new Set(settings.pinnedSessions);
+                if (pinnedSessions.has(context.sessionId)) pinnedSessions.delete(context.sessionId);
+                else pinnedSessions.add(context.sessionId);
+                await store.save({ ...settings, pinnedSessions: [...pinnedSessions] });
+                refresh();
+              },
+            },
+          },
+          events: {
+            changed: {
+              requiredPermissions: ["yomni.storage.read"],
+              subscribe(emit, context) {
+                assertServiceCallPermissions(context, ["yomni.storage.read"], { readOnly: true });
+                footerListeners.add(emit);
+                return () => { footerListeners.delete(emit); };
+              },
+            },
+          },
+        },
+      },
+    };
   }).activate(host);
 };
